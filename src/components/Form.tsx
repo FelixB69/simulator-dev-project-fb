@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/form";
 import { BorderBeam } from "./magicui/border-beam";
 import { useState } from "react";
-import ProcessTerminal from "./ProcessTerminal"; // ajuste le chemin si besoin
+import ProcessTerminal from "./ProcessTerminal";
+import ScoreResult from "./ScoreResult";
 
 const formSchema = z.object({
   location: z.string().min(2, "La localisation est requise"),
@@ -29,6 +30,8 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function CustomForm() {
   const [showTerminal, setShowTerminal] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const [isTerminalComplete, setIsTerminalComplete] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -40,10 +43,10 @@ export default function CustomForm() {
   });
 
   const onSubmit = async (data: FormData) => {
-    setShowTerminal(true); // on remplace le formulaire par le terminal
+    setShowTerminal(true);
 
     try {
-      const response = await fetch("http://localhost:4000/score/calculate", {
+      const response = await fetch("http://localhost:3000/scores/statistics", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -53,7 +56,8 @@ export default function CustomForm() {
 
       if (!response.ok) throw new Error("Erreur lors de l'envoi");
 
-      // Tu pourrais gérer l'affichage des résultats après ici !
+      const resData = await response.json();
+      setResult(resData);
     } catch (error) {
       console.error("Erreur :", error);
       alert("Échec de l'envoi des données.");
@@ -63,15 +67,19 @@ export default function CustomForm() {
   return (
     <>
       {showTerminal ? (
-        <div className=" min-h-screen bg-black p-6 flex justify-center items-center">
-          <ProcessTerminal />
-        </div>
+        isTerminalComplete ? (
+          result ? (
+            <ScoreResult result={result} />
+          ) : null
+        ) : (
+          <ProcessTerminal onComplete={() => setIsTerminalComplete(true)} />
+        )
       ) : (
-        <div className="flex items-center justify-center min-h-screen bg-gray-light p-6">
-          <div className="relative bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
-            <BorderBeam className="absolute inset-0 rounded-lg" />
+        <div className="flex items-center justify-center min-h-screen bg-[var(--gray-light)] p-6">
+          <div className="relative bg-[var(--white)] shadow-lg rounded-[var(--radius)] p-6 w-full max-w-md">
+            <BorderBeam className="absolute inset-0 rounded-[var(--radius)]" />
 
-            <h2 className="text-2xl font-bold mb-4 text-gray-dark relative z-10">
+            <h2 className="text-2xl font-bold mb-4 text-[var(--gray-dark)] relative z-10">
               Vos informations salariales
             </h2>
 
