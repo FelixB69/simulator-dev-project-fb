@@ -24,6 +24,7 @@ const formSchema = z.object({
     .number()
     .min(1, "La compensation doit être un nombre valide"),
   total_xp: z.coerce.number().min(0, "L'expérience doit être positive"),
+  email: z.string().email("Email invalide"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -39,6 +40,7 @@ export default function CustomForm() {
       location: "",
       compensation: undefined,
       total_xp: undefined,
+      email: "",
     },
   });
 
@@ -80,7 +82,7 @@ export default function CustomForm() {
             <BorderBeam className="absolute inset-0 rounded-[var(--radius)]" />
 
             <h2 className="text-2xl font-bold mb-4 text-[var(--gray-dark)] relative z-10">
-              Vos informations salariales
+              Tes informations salariales
             </h2>
 
             <Form {...form}>
@@ -112,7 +114,7 @@ export default function CustomForm() {
                         <Input
                           {...field}
                           type="number"
-                          placeholder="Ex: 40000"
+                          placeholder="Ex: 47000"
                         />
                       </FormControl>
                       <FormMessage />
@@ -134,12 +136,39 @@ export default function CustomForm() {
                   )}
                 />
 
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="email"
+                          placeholder="Ex: bonjour@felixberger.fr"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <Button
                   type="submit"
-                  disabled={form.formState.isSubmitting}
-                  className="w-full"
+                  disabled={
+                    form.formState.isSubmitting ||
+                    !form.watch("location") ||
+                    !form.watch("compensation") ||
+                    !form.watch("total_xp") ||
+                    !form.watch("email") ||
+                    Object.keys(form.formState.errors).length > 0
+                  }
+                  className="w-full cursor-pointer bg-[var(--blue)] text-white hover:bg-[var(--gray-dark)] transition duration-200"
                 >
-                  {form.formState.isSubmitting ? "Envoi..." : "Envoyer"}
+                  {form.formState.isSubmitting
+                    ? "Envoi..."
+                    : "Calculer son score"}
                 </Button>
               </form>
             </Form>
