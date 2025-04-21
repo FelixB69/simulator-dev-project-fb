@@ -47,8 +47,10 @@ export default function CustomForm() {
   const onSubmit = async (data: FormData) => {
     setShowTerminal(true);
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
+
     try {
-      const response = await fetch("http://localhost:3000/scores/statistics", {
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
