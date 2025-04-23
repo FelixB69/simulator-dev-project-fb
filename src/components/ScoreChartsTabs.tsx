@@ -2,9 +2,9 @@
 import React from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-import SalaryLineChart from "./SalaryLineChart";
-import SimilarityHistogram from "./SimilarityHistogram";
-import GaussCurveChart from "./GaussCurveChart";
+import SalaryLineChart from "./charts/SalaryLineChart";
+import SimilarityHistogram from "./charts/SimilarityHistogram";
+import GaussCurveChart from "./charts/GaussCurveChart";
 
 type Props = {
   chartData: {
@@ -23,38 +23,38 @@ export default function ScoreChartsTabs({
   stdScore,
 }: Props) {
   return (
-    <div className="mt-10 w-full max-w-2xl mx-auto ">
+    <div className="mt-10 w-full px-4 sm:px-6 lg:px-0 max-w-5xl mx-auto">
       <Tabs defaultValue="line">
-        <TabsList className="bg-[var(--gray-light)] rounded-[var(--radius)] p-1 flex gap-2 justify-center mb-4">
+        <TabsList className="bg-[var(--gray-light)] rounded-[var(--radius)] p-1 flex flex-wrap gap-2 justify-center mb-4">
           <TabsTrigger
             value="line"
-            className="px-4 py-1 text-sm text-[var(--gray-dark)] data-[state=active]:bg-[var(--blue)] data-[state=active]:text-white rounded-md transition"
+            className="px-3 py-2 text-sm sm:text-base text-[var(--gray-dark)] data-[state=active]:bg-[var(--blue)] data-[state=active]:text-white rounded-md transition whitespace-nowrap"
           >
             Salaire par expérience
           </TabsTrigger>
           <TabsTrigger
             value="histogram"
-            className="px-4 py-1 text-sm text-[var(--gray-dark)] data-[state=active]:bg-[var(--blue)] data-[state=active]:text-white rounded-md transition"
+            className="px-3 py-2 text-sm sm:text-base text-[var(--gray-dark)] data-[state=active]:bg-[var(--blue)] data-[state=active]:text-white rounded-md transition whitespace-nowrap"
           >
             Répartition des scores
           </TabsTrigger>
           <TabsTrigger
             value="gauss"
-            className="px-4 py-1 text-sm text-[var(--gray-dark)] data-[state=active]:bg-[var(--blue)] data-[state=active]:text-white rounded-md transition"
+            className="px-3 py-2 text-sm sm:text-base text-[var(--gray-dark)] data-[state=active]:bg-[var(--blue)] data-[state=active]:text-white rounded-md transition whitespace-nowrap"
           >
             Courbe de cohérence
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="line">
+        <TabsContent value="line" className="w-full overflow-x-auto">
           <SalaryLineChart data={chartData.averageByXp} />
         </TabsContent>
 
-        <TabsContent value="histogram">
+        <TabsContent value="histogram" className="w-full overflow-x-auto">
           <SimilarityHistogram data={chartData.histogram} />
         </TabsContent>
 
-        <TabsContent value="gauss">
+        <TabsContent value="gauss" className="w-full overflow-x-auto">
           <GaussCurveChart
             mean={meanScore}
             std={stdScore}

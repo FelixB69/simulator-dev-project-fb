@@ -13,6 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 import { BorderBeam } from "./magicui/border-beam";
 import { useState } from "react";
 import ProcessTerminal from "./ProcessTerminal";
@@ -25,6 +26,9 @@ const formSchema = z.object({
     .min(1, "La compensation doit être un nombre valide"),
   total_xp: z.coerce.number().min(0, "L'expérience doit être positive"),
   email: z.string().email("Email invalide"),
+  consent: z.boolean().refine((val) => val === true, {
+    message: "Vous devez accepter d’être recontacté.",
+  }),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -41,6 +45,7 @@ export default function CustomForm() {
       compensation: undefined,
       total_xp: undefined,
       email: "",
+      consent: false,
     },
   });
 
@@ -68,6 +73,15 @@ export default function CustomForm() {
     }
   };
 
+  const isDisabled =
+    form.formState.isSubmitting ||
+    !form.watch("location") ||
+    !form.watch("compensation") ||
+    !form.watch("total_xp") ||
+    !form.watch("email") ||
+    !form.watch("consent") ||
+    Object.keys(form.formState.errors).length > 0;
+
   return (
     <>
       {showTerminal ? (
@@ -79,18 +93,21 @@ export default function CustomForm() {
           <ProcessTerminal onComplete={() => setIsTerminalComplete(true)} />
         )
       ) : (
-        <div className="flex items-center justify-center min-h-screen bg-[var(--gray-light)] p-6">
-          <div className="relative bg-[var(--white)] shadow-lg rounded-[var(--radius)] p-6 w-full max-w-md">
+        <div className="flex items-center justify-center min-h-screen bg-[var(--gray-light)] px-4">
+          <div
+            className="relative bg-[var(--white)] shadow-lg rounded-[var(--radius)] p-8 w-full max-w-xl sm:p-6 sm:max-w-lg
+             animate-in fade-in-0 zoom-in-95 duration-800 ease-out"
+          >
             <BorderBeam className="absolute inset-0 rounded-[var(--radius)]" />
 
-            <h2 className="text-2xl font-bold mb-4 text-[var(--gray-dark)] relative z-10">
+            <h2 className="text-2xl font-bold mb-6 text-[var(--gray-dark)] relative z-10">
               Tes informations salariales
             </h2>
 
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4 relative z-10"
+                className="space-y-6 relative z-10"
               >
                 <FormField
                   control={form.control}
@@ -156,16 +173,37 @@ export default function CustomForm() {
                   )}
                 />
 
+                <FormField
+                  control={form.control}
+                  name="consent"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center gap-3">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          id="consent"
+                          className="cursor-pointer"
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-snug">
+                        <FormLabel
+                          htmlFor="consent"
+                          className="text-sm font-normal"
+                        >
+                          En fournissant mon adresse email, j’accepte d’être
+                          recontacté par l’administrateur du site à des fins
+                          d’échange ou de suivi.
+                        </FormLabel>
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
                 <Button
                   type="submit"
-                  disabled={
-                    form.formState.isSubmitting ||
-                    !form.watch("location") ||
-                    !form.watch("compensation") ||
-                    !form.watch("total_xp") ||
-                    !form.watch("email") ||
-                    Object.keys(form.formState.errors).length > 0
-                  }
+                  disabled={isDisabled}
                   className="w-full cursor-pointer bg-[var(--blue)] text-white hover:bg-[var(--gray-dark)] transition duration-200"
                 >
                   {form.formState.isSubmitting

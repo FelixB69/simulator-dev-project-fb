@@ -3,7 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { TypingAnimation } from "./magicui/terminal";
 import ScoreChartsTabs from "./ScoreChartsTabs";
-import CircularGauge from "./CircularGauge";
+import CircularGauge from "./charts/CircularGauge";
 import { toScore10 } from "@/utils/helper";
 
 type ScoreResultProps = {

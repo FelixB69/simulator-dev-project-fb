@@ -11,7 +11,7 @@ export default function ProcessTerminal({
   useEffect(() => {
     const timer = setTimeout(() => {
       onComplete();
-    }, 9000);
+    }, 12000);
 
     return () => clearTimeout(timer);
   }, [onComplete]);
