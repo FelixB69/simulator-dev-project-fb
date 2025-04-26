@@ -7,39 +7,65 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Form,
-  FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
+  FormControl,
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
-import { BorderBeam } from "./magicui/border-beam";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { cn } from "@/utils/cn";
 import ProcessTerminal from "./ProcessTerminal";
 import ScoreResult from "./ScoreResult";
+import LiquidWaveBackground from "./ui/LiquideWaveBackground";
 
-const formSchema = z.object({
-  location: z.string().min(2, "La localisation est requise"),
-  compensation: z.coerce
-    .number()
-    .min(1, "La compensation doit être un nombre valide"),
-  total_xp: z.coerce.number().min(0, "L'expérience doit être positive"),
+const FIELDS = [
+  {
+    name: "location",
+    label: "Localisation",
+    type: "text",
+    placeholder: "Lyon",
+  },
+  {
+    name: "compensation",
+    label: "Salaire Brut (€)",
+    type: "number",
+    placeholder: "47000",
+  },
+  {
+    name: "total_xp",
+    label: "Expérience (années)",
+    type: "number",
+    placeholder: "3",
+  },
+  {
+    name: "email",
+    label: "Email",
+    type: "email",
+    placeholder: "votre.email@exemple.com",
+  },
+];
+
+const schema = z.object({
+  location: z.string().min(2, "Localisation requise"),
+  compensation: z.coerce.number().min(1, "Salaire invalide"),
+  total_xp: z.coerce.number().min(0, "Expérience invalide"),
   email: z.string().email("Email invalide"),
   consent: z.boolean().refine((val) => val === true, {
     message: "Vous devez accepter d’être recontacté.",
   }),
 });
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<typeof schema>;
 
-export default function CustomForm() {
-  const [showTerminal, setShowTerminal] = useState(false);
+export default function LandingForm() {
+  const [phase, setPhase] = useState<"form" | "terminal" | "result">("form");
   const [result, setResult] = useState<any>(null);
-  const [isTerminalComplete, setIsTerminalComplete] = useState(false);
 
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       location: "",
       compensation: undefined,
@@ -48,30 +74,6 @@ export default function CustomForm() {
       consent: false,
     },
   });
-
-  const onSubmit = async (data: FormData) => {
-    setShowTerminal(true);
-
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
-
-    try {
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) throw new Error("Erreur lors de l'envoi");
-
-      const resData = await response.json();
-      setResult(resData);
-    } catch (error) {
-      console.error("Erreur :", error);
-      alert("Échec de l'envoi des données.");
-    }
-  };
 
   const isDisabled =
     form.formState.isSubmitting ||
@@ -82,121 +84,105 @@ export default function CustomForm() {
     !form.watch("consent") ||
     Object.keys(form.formState.errors).length > 0;
 
-  return (
-    <>
-      {showTerminal ? (
-        isTerminalComplete ? (
-          result ? (
-            <ScoreResult result={result} />
-          ) : null
-        ) : (
-          <ProcessTerminal onComplete={() => setIsTerminalComplete(true)} />
-        )
-      ) : (
-        <div className="flex items-center justify-center min-h-screen bg-[var(--gray-light)] px-4">
-          <div
-            className="relative bg-[var(--white)] shadow-lg rounded-[var(--radius)] p-8 w-full max-w-xl sm:p-6 sm:max-w-lg
-             animate-in fade-in-0 zoom-in-95 duration-800 ease-out"
-          >
-            <BorderBeam className="absolute inset-0 rounded-[var(--radius)]" />
+  const handleSubmit = async (data: FormData) => {
+    setPhase("terminal");
+    try {
+      const res = await fetch(process.env.NEXT_PUBLIC_API_URL!, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error();
+      const response = await res.json();
+      setResult(response);
+    } catch {
+      alert("Erreur lors de l'envoi des données.");
+    }
+  };
 
-            <h2 className="text-2xl font-bold mb-6 text-[var(--gray-dark)] relative z-10">
-              Tes informations salariales
-            </h2>
+  return (
+    <div className="relative min-h-screen bg-[var(--gray-light)] flex items-center justify-center overflow-hidden">
+      {phase === "form" && <LiquidWaveBackground />}
+      <AnimatePresence mode="wait">
+        {phase === "form" && (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.5 }}
+            className="relative z-10 w-full max-w-md sm:max-w-xl md:max-w-2xl mx-auto"
+          >
+            <div className="text-center mb-6 sm:mb-8 sm:mt-0 mt-8 px-2 sm:px-0">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--blue)] leading-tight">
+                Votre salaire est-il aligné avec le marché ?
+              </h1>
+              <p className="mt-4 text-[var(--gray-dark)] text-base sm:text-lg">
+                Grâce à notre{" "}
+                <span className="font-semibold text-[var(--blue)]">
+                  modèle de prédiction
+                </span>{" "}
+                basé sur plus de 800 salaires analysés, découvrez en quelques
+                secondes si votre rémunération est cohérente.
+              </p>
+            </div>
 
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6 relative z-10"
+                onSubmit={form.handleSubmit(handleSubmit)}
+                className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6"
               >
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Localisation</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Ex: Lyon" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="compensation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Salaire (brut annuel/€)</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="number"
-                          placeholder="Ex: 47000"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="total_xp"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Expérience (années)</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" placeholder="Ex: 3" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="email"
-                          placeholder="Ex: bonjour@felixberger.fr"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {FIELDS.map((field) => (
+                  <FormField
+                    key={field.name}
+                    control={form.control}
+                    name={field.name as keyof FormData}
+                    render={({ field: f }) => (
+                      <FormItem>
+                        <FormLabel>{field.label}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type={field.type}
+                            placeholder={field.placeholder}
+                            value={
+                              typeof f.value === "boolean" ? "" : f.value ?? ""
+                            }
+                            onChange={(e) =>
+                              f.onChange(
+                                field.type === "number"
+                                  ? Number(e.target.value)
+                                  : e.target.value,
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
 
                 <FormField
                   control={form.control}
                   name="consent"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-3">
+                    <FormItem className="flex items-start gap-3">
                       <FormControl>
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
                           id="consent"
-                          className="cursor-pointer"
+                          className="border-gray-300 cursor-pointer"
                         />
                       </FormControl>
-                      <div className="space-y-1 leading-snug">
-                        <FormLabel
-                          htmlFor="consent"
-                          className="text-sm font-normal"
-                        >
-                          En fournissant mon adresse email, j’accepte d’être
-                          recontacté par l’administrateur du site à des fins
-                          d’échange ou de suivi.
-                        </FormLabel>
-                        <FormMessage />
-                      </div>
+                      <FormLabel
+                        htmlFor="consent"
+                        className="text-sm font-normal text-[var(--gray-dark)]"
+                      >
+                        En fournissant mon adresse email, j’accepte d’être
+                        recontacté à des fins d’échange ou de suivi.
+                      </FormLabel>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -204,17 +190,46 @@ export default function CustomForm() {
                 <Button
                   type="submit"
                   disabled={isDisabled}
-                  className="w-full cursor-pointer bg-[var(--blue)] text-white hover:bg-[var(--gray-dark)] transition duration-200"
+                  className={cn(
+                    "w-full bg-[var(--blue)] hover:bg-[var(--blue)]/90 text-white font-semibold py-3 cursor-pointer",
+                    isDisabled && "opacity-50 cursor-not-allowed",
+                  )}
                 >
                   {form.formState.isSubmitting
-                    ? "Envoi..."
-                    : "Calculer son score"}
+                    ? "Envoi en cours..."
+                    : "Vérifier mon salaire"}
                 </Button>
               </form>
             </Form>
-          </div>
-        </div>
-      )}
-    </>
+          </motion.div>
+        )}
+
+        {phase === "terminal" && (
+          <motion.div
+            key="terminal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="relative z-10 w-full h-full"
+          >
+            <ProcessTerminal onComplete={() => setPhase("result")} />
+          </motion.div>
+        )}
+
+        {phase === "result" && result && (
+          <motion.div
+            key="result"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="relative z-10 w-full max-w-4xl mx-auto py-12 px-4"
+          >
+            <ScoreResult result={result} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

@@ -23,9 +23,9 @@ export default function ScoreChartsTabs({
   stdScore,
 }: Props) {
   return (
-    <div className="mt-10 w-full px-4 sm:px-6 lg:px-0 max-w-5xl mx-auto">
+    <div className="w-full px-2 sm:px-4 lg:px-0 max-w-5xl mx-auto ">
       <Tabs defaultValue="line">
-        <TabsList className="bg-[var(--gray-light)] rounded-[var(--radius)] p-1 flex flex-wrap gap-2 justify-center mb-4">
+        <TabsList className="bg-[var(--gray-light)] rounded-[var(--radius)] p-1 flex flex-wrap gap-2 justify-center mb-3">
           <TabsTrigger
             value="line"
             className="px-3 py-2 text-sm sm:text-base text-[var(--gray-dark)] data-[state=active]:bg-[var(--blue)] data-[state=active]:text-white rounded-md transition whitespace-nowrap"
@@ -46,15 +46,15 @@ export default function ScoreChartsTabs({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="line" className="w-full overflow-x-auto">
+        <TabsContent value="line" className="w-full">
           <SalaryLineChart data={chartData.averageByXp} />
         </TabsContent>
 
-        <TabsContent value="histogram" className="w-full overflow-x-auto">
+        <TabsContent value="histogram" className="w-full">
           <SimilarityHistogram data={chartData.histogram} />
         </TabsContent>
 
-        <TabsContent value="gauss" className="w-full overflow-x-auto">
+        <TabsContent value="gauss" className="w-full ">
           <GaussCurveChart
             mean={meanScore}
             std={stdScore}
