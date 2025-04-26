@@ -8,11 +8,45 @@ import { toScore10 } from "@/utils/helper";
 import { cn } from "@/utils/cn";
 
 type ScoreResultProps = {
-  /* types identiques */
+  result: {
+    diagnostic: {
+      title: string;
+      description: string;
+    };
+    estimatedGap: {
+      predicted: number;
+      actual: number;
+      difference: number;
+      percentage: number;
+      comment: string;
+    };
+    salaryPosition: {
+      percentile: number;
+      rankLabel: string;
+      comparison: string;
+    };
+    conseil: string;
+    chartData: {
+      averageByXp: { xp: number; average: number }[];
+      histogram: { range: string; count: number }[];
+    };
+    coherenceScore: number;
+    meanScore: number;
+    stdScore: number;
+  };
 };
 
 const fadeIn = {
-  /* animations identiques */
+  hidden: { opacity: 0, y: 20 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.1,
+      duration: 0.4,
+      ease: [0.25, 0.1, 0.25, 1],
+    },
+  }),
 };
 
 const ResultCard = ({ children, className, custom }: any) => (
