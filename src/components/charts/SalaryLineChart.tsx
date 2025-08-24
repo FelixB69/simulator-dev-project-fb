@@ -32,7 +32,7 @@ const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
 
 export default function SalaryLineChart({ data }: Props) {
   return (
-    <div className="w-full h-64 bg-[var(--gray-light)] rounded-[var(--radius)] p-4">
+    <div className="w-full h-64 bg-[var(--gray-light)] rounded-[var(--radius)] p-4 mb-10">
       <h3 className="font-semibold text-[var(--gray-dark)] mb-2">
         Salaire moyen selon l'expérience
       </h3>

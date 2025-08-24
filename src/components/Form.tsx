@@ -17,9 +17,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { cn } from "@/utils/cn";
-import ProcessTerminal from "./ProcessTerminal";
 import ScoreResult from "./ScoreResult";
 import LiquidWaveBackground from "./ui/LiquideWaveBackground";
+import ResultSkeleton from "./ResultSkeleton";
 
 const FIELDS = [
   {
@@ -61,8 +61,9 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function LandingForm() {
-  const [phase, setPhase] = useState<"form" | "terminal" | "result">("form");
+  const [phase, setPhase] = useState<"form" | "result">("form");
   const [result, setResult] = useState<any>(null);
+  const [loading, setLoading] = useState(true); // control skeleton
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -85,7 +86,13 @@ export default function LandingForm() {
     Object.keys(form.formState.errors).length > 0;
 
   const handleSubmit = async (data: FormData) => {
-    setPhase("terminal");
+    setPhase("result");
+    setLoading(true);
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 4000); // Fake loading
+
     try {
       const res = await fetch(process.env.NEXT_PUBLIC_API_URL!, {
         method: "POST",
@@ -204,20 +211,7 @@ export default function LandingForm() {
           </motion.div>
         )}
 
-        {phase === "terminal" && (
-          <motion.div
-            key="terminal"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="relative z-10 w-full h-full"
-          >
-            <ProcessTerminal onComplete={() => setPhase("result")} />
-          </motion.div>
-        )}
-
-        {phase === "result" && result && (
+        {phase === "result" && (
           <motion.div
             key="result"
             initial={{ opacity: 0 }}
@@ -226,7 +220,11 @@ export default function LandingForm() {
             transition={{ duration: 0.4 }}
             className="relative z-10 w-full max-w-4xl mx-auto py-12 px-4"
           >
-            <ScoreResult result={result} />
+            {loading || !result ? (
+              <ResultSkeleton />
+            ) : (
+              <ScoreResult result={result} />
+            )}
           </motion.div>
         )}
       </AnimatePresence>

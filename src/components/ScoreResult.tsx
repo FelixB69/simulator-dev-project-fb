@@ -112,12 +112,19 @@ export default function ScoreResult({ result }: ScoreResultProps) {
               <CircularGauge value={meanScore10} label="Le score moyen" />
             </div>
 
-            <TypingAnimation
-              delay={500}
-              className="text-[var(--gray-dark)] text-base sm:text-lg font-medium leading-relaxed max-w-2xl mx-auto"
-            >
+            <h1 className="text-[var(--gray-dark)] text-base sm:text-lg font-medium leading-relaxed max-w-2xl mx-auto">
               {diagnostic.description}
-            </TypingAnimation>
+            </h1>
+          </ResultCard>
+          <ResultCard custom={4}>
+            <div className="w-full">
+              <ScoreChartsTabs
+                chartData={result.chartData}
+                coherenceScore={result.coherenceScore}
+                meanScore={result.meanScore}
+                stdScore={result.stdScore}
+              />
+            </div>
           </ResultCard>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -207,17 +214,6 @@ export default function ScoreResult({ result }: ScoreResultProps) {
               </div>
             </ResultCard>
           )}
-
-          <ResultCard custom={4}>
-            <div className="w-full">
-              <ScoreChartsTabs
-                chartData={result.chartData}
-                coherenceScore={result.coherenceScore}
-                meanScore={result.meanScore}
-                stdScore={result.stdScore}
-              />
-            </div>
-          </ResultCard>
         </div>
       </motion.div>
     </AnimatePresence>
