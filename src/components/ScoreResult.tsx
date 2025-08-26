@@ -29,6 +29,7 @@ type ScoreResultProps = {
     conseil?: string;
     chartData: {
       averageByXp: { xp: number; average: number }[];
+      medianByXp: { xp: number; median: number }[];
       histogram: { range: string; count: number }[];
     };
     coherenceScore: number;
@@ -49,13 +50,12 @@ const fadeIn = {
     },
   }),
 };
-
 const ResultCard = ({ children, className, custom }: any) => (
   <motion.div
     variants={fadeIn}
     custom={custom}
     className={cn(
-      "relative backdrop-blur-sm bg-[var(--white)]/90 shadow-lg rounded-[var(--radius)] p-4 sm:p-6 md:p-8 transition-all duration-200 hover:shadow-xl",
+      "relative backdrop-blur-sm bg-[var(--white)]/90 shadow-lg rounded-[var(--radius)] p-4 sm:p-6 md:p-8",
       className,
     )}
   >

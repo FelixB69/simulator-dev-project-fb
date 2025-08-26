@@ -12,10 +12,12 @@ import {
 import SalaryLineChart from "./charts/SalaryLineChart";
 import SimilarityHistogram from "./charts/SimilarityHistogram";
 import GaussCurveChart from "./charts/GaussCurveChart";
+import { mergeAvgMed } from "@/utils/helper";
 
 type Props = {
   chartData: {
     averageByXp: { xp: number; average: number }[];
+    medianByXp: { xp: number; median: number }[];
     histogram: { range: string; count: number }[];
   };
   coherenceScore: number;
@@ -36,6 +38,10 @@ export default function ScoreChartsTabs({
   stdScore,
 }: Props) {
   const [value, setValue] = React.useState<string>("line");
+
+  // dataFromApi = l'objet JSON que tu as collé
+  const { averageByXp, medianByXp } = chartData;
+  const mergedData = mergeAvgMed(averageByXp, medianByXp);
 
   return (
     <div className="w-full px-2 sm:px-4 lg:px-0 max-w-5xl mx-auto">
@@ -86,7 +92,7 @@ export default function ScoreChartsTabs({
 
         {/* Contenus */}
         <TabsContent value="line" className="w-full">
-          <SalaryLineChart data={chartData.averageByXp} />
+          <SalaryLineChart data={mergedData} />
         </TabsContent>
 
         <TabsContent value="histogram" className="w-full">

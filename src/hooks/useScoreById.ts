@@ -12,6 +12,7 @@ export type ScoreOutput = {
   salaryPosition: { percentile: number; rankLabel: string; comparison: string };
   chartData: {
     averageByXp: { xp: number; average: number }[];
+    medianByXp: { xp: number; median: number }[];
     histogram: { range: string; count: number }[];
   };
   coherenceScore: number;
