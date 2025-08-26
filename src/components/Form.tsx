@@ -88,7 +88,7 @@ export default function LandingForm() {
     Object.keys(form.formState.errors).length > 0;
 
   const handleSubmit = async (data: FormData) => {
-    const MIN_LOADING_MS = 800;
+    const MIN_LOADING_MS = 2500;
     setPhase("loading");
 
     try {
@@ -134,7 +134,7 @@ export default function LandingForm() {
                 <span className="font-semibold text-[var(--blue)]">
                   modèle de prédiction
                 </span>{" "}
-                basé sur plus de 800 salaires analysés, découvrez en quelques
+                basé sur plus de 500 salaires analysés, découvrez en quelques
                 secondes si votre rémunération est cohérente.
               </p>
             </div>

@@ -30,7 +30,7 @@ export default function ResultSkeleton() {
     <motion.div
       initial="hidden"
       animate="visible"
-      className="relative max-w-7xl mx-auto px-4 sm:px-6 md:px-8"
+      className="relative z-10 w-full max-w-4xl mx-auto py-12 px-4 text-center text-[var(--gray-dark)]"
     >
       <div className="relative z-10 space-y-6">
         {/* Gauges */}
