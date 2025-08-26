@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,9 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
 import { cn } from "@/utils/cn";
-import ScoreResult from "./ScoreResult";
 import LiquidWaveBackground from "./ui/LiquideWaveBackground";
 import ResultSkeleton from "./ResultSkeleton";
 
@@ -46,7 +47,7 @@ const FIELDS = [
     type: "email",
     placeholder: "votre.email@exemple.com",
   },
-];
+] as const;
 
 const schema = z.object({
   location: z.string().min(2, "Localisation requise"),
@@ -60,10 +61,11 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export default function LandingForm() {
-  const [phase, setPhase] = useState<"form" | "result">("form");
-  const [result, setResult] = useState<any>(null);
-  const [loading, setLoading] = useState(true); // control skeleton
+  const [phase, setPhase] = useState<"form" | "loading">("form");
+  const router = useRouter();
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -86,30 +88,33 @@ export default function LandingForm() {
     Object.keys(form.formState.errors).length > 0;
 
   const handleSubmit = async (data: FormData) => {
-    setPhase("result");
-    setLoading(true);
-
-    setTimeout(() => {
-      setLoading(false);
-    }, 4000); // Fake loading
+    const MIN_LOADING_MS = 800;
+    setPhase("loading");
 
     try {
-      const res = await fetch(process.env.NEXT_PUBLIC_API_URL!, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error();
-      const response = await res.json();
-      setResult(response);
-    } catch {
+      const [res] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_API_URL!}/scores/analyze`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }),
+        sleep(MIN_LOADING_MS),
+      ]);
+      if (!res.ok) throw new Error("Erreur lors du POST");
+
+      const { id } = await res.json();
+      router.push(`/scores/${id}`);
+    } catch (e) {
+      console.error(e);
       alert("Erreur lors de l'envoi des données.");
+      setPhase("form");
     }
   };
 
   return (
     <div className="relative min-h-screen bg-[var(--gray-light)] flex items-center justify-center overflow-hidden">
       {phase === "form" && <LiquidWaveBackground />}
+
       <AnimatePresence mode="wait">
         {phase === "form" && (
           <motion.div
@@ -152,7 +157,9 @@ export default function LandingForm() {
                             type={field.type}
                             placeholder={field.placeholder}
                             value={
-                              typeof f.value === "boolean" ? "" : f.value ?? ""
+                              typeof f.value === "boolean"
+                                ? ""
+                                : (f.value as any) ?? ""
                             }
                             onChange={(e) =>
                               f.onChange(
@@ -211,20 +218,16 @@ export default function LandingForm() {
           </motion.div>
         )}
 
-        {phase === "result" && (
+        {phase === "loading" && (
           <motion.div
-            key="result"
+            key="loading"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="relative z-10 w-full max-w-4xl mx-auto py-12 px-4"
+            transition={{ duration: 0.3 }}
+            className="relative z-10 w-full max-w-4xl mx-auto py-12 px-4 text-center text-[var(--gray-dark)]"
           >
-            {loading || !result ? (
-              <ResultSkeleton />
-            ) : (
-              <ScoreResult result={result} />
-            )}
+            <ResultSkeleton />
           </motion.div>
         )}
       </AnimatePresence>

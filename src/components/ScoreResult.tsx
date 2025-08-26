@@ -12,6 +12,7 @@ type ScoreResultProps = {
     diagnostic: {
       title: string;
       description: string;
+      icon?: string;
     };
     estimatedGap: {
       predicted: number;
@@ -25,7 +26,7 @@ type ScoreResultProps = {
       rankLabel: string;
       comparison: string;
     };
-    conseil: string;
+    conseil?: string;
     chartData: {
       averageByXp: { xp: number; average: number }[];
       histogram: { range: string; count: number }[];
@@ -116,16 +117,6 @@ export default function ScoreResult({ result }: ScoreResultProps) {
               {diagnostic.description}
             </h1>
           </ResultCard>
-          <ResultCard custom={4}>
-            <div className="w-full">
-              <ScoreChartsTabs
-                chartData={result.chartData}
-                coherenceScore={result.coherenceScore}
-                meanScore={result.meanScore}
-                stdScore={result.stdScore}
-              />
-            </div>
-          </ResultCard>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <ResultCard custom={1}>
@@ -214,6 +205,17 @@ export default function ScoreResult({ result }: ScoreResultProps) {
               </div>
             </ResultCard>
           )}
+
+          <ResultCard custom={4}>
+            <div className="w-full">
+              <ScoreChartsTabs
+                chartData={result.chartData}
+                coherenceScore={result.coherenceScore}
+                meanScore={result.meanScore}
+                stdScore={result.stdScore}
+              />
+            </div>
+          </ResultCard>
         </div>
       </motion.div>
     </AnimatePresence>
