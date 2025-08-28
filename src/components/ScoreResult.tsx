@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { TypingAnimation } from "./magicui/terminal";
 import ScoreChartsTabs from "./ScoreChartsTabs";
 import CircularGauge from "./charts/CircularGauge";
@@ -38,7 +38,7 @@ type ScoreResultProps = {
   };
 };
 
-const fadeIn = {
+const fadeIn: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: (i = 0) => ({
     opacity: 1,

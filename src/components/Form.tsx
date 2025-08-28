@@ -21,6 +21,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/utils/cn";
 import LiquidWaveBackground from "./ui/LiquideWaveBackground";
 import ResultSkeleton from "./ResultSkeleton";
+import EmailScoresAccordion from "./form/EmailScoresAccordion";
 
 const FIELDS = [
   {
@@ -112,7 +113,7 @@ export default function LandingForm() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[var(--gray-light)] flex items-center justify-center overflow-hidden">
+    <div className="relative min-h-screen bg-[var(--gray-light)] flex items-center justify-center overflow-hidden flex-col">
       {phase === "form" && <LiquidWaveBackground />}
 
       <AnimatePresence mode="wait">
@@ -230,6 +231,15 @@ export default function LandingForm() {
             <ResultSkeleton />
           </motion.div>
         )}
+        <motion.div
+          key="form"
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.96 }}
+          transition={{ duration: 0.5 }}
+        >
+          <EmailScoresAccordion />
+        </motion.div>
       </AnimatePresence>
     </div>
   );
