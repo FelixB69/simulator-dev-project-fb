@@ -77,12 +77,13 @@ export default function EmailScoresAccordion() {
 
   const email = form.watch("email");
   return (
-    <div className="relative z-10 py-6">
-      <section className="w-full min-w-2xl mx-auto">
+    <div className="relative z-10 py-6 mt-6">
+      {/* Container */}
+      <section className="mx-auto w-full max-w-4xl  min-w-[350px] sm:min-w-2xl">
         <Accordion
           type="single"
           collapsible
-          className="w-full bg-white rounded-[var(--radius)] shadow-xl ring-1 ring-black/5"
+          className="bg-white rounded-[var(--radius)] shadow-xl ring-1 ring-black/5"
         >
           <AccordionItem
             value="email"
@@ -91,27 +92,23 @@ export default function EmailScoresAccordion() {
             {/* Trigger */}
             <AccordionTrigger
               className={cn(
-                "group flex w-full items-center justify-between gap-3 cursor-pointer",
-                "px-4 py-3 sm:px-5 sm:py-4 text-left",
-                "font-medium text-[var(--blue)]",
+                "group flex w-full items-center justify-between gap-2 cursor-pointer",
+                "px-3 py-2 sm:px-5 sm:py-4 text-left", // mobile plus compact
+                "font-medium text-[var(--blue)] text-sm sm:text-base", // typo + petite en mobile
                 "bg-white hover:bg-gray-50 focus-visible:outline-none",
                 "focus-visible:ring-2 focus-visible:ring-[var(--blue)] focus-visible:ring-offset-2 focus-visible:ring-offset-white",
               )}
             >
               <span>Rechercher des scores par email</span>
-              {/* chevron qui pivote */}
             </AccordionTrigger>
 
-            {/* Content animé */}
-            <AccordionContent
-              className={cn("overflow-hidden bg-white", "px-4 sm:px-6")}
-            >
-              {/* Form */}
+            {/* Content */}
+            <AccordionContent className="overflow-hidden bg-white px-3 pb-3 sm:px-6 sm:pb-6">
               {results === null && (
                 <Form {...form}>
                   <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-4"
+                    className="space-y-3 sm:space-y-4"
                   >
                     <FormField
                       control={form.control}
@@ -125,27 +122,29 @@ export default function EmailScoresAccordion() {
                       }}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-[var(--gray-dark)]">
+                          <FormLabel className="text-[var(--gray-dark)] text-sm sm:text-base">
                             Email
                           </FormLabel>
                           <FormControl>
                             <Input
                               type="email"
                               placeholder="votre.email@exemple.com"
+                              className="h-9 sm:h-11 text-sm sm:text-base"
                               {...field}
                             />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-xs sm:text-sm" />
                         </FormItem>
                       )}
                     />
 
-                    <div className="flex items-center justify-end gap-3">
+                    {/* Boutons -> stack en mobile */}
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                       <Button
                         type="button"
                         variant="ghost"
                         onClick={() => form.reset({ email: "" })}
-                        className="cursor-pointer"
+                        className="order-2 sm:order-1 w-full sm:w-auto"
                       >
                         Réinitialiser
                       </Button>
@@ -153,7 +152,8 @@ export default function EmailScoresAccordion() {
                         type="submit"
                         disabled={isDisabled}
                         className={cn(
-                          "bg-[var(--blue)] hover:bg-[var(--blue)]/90 text-white cursor-pointer",
+                          "order-1 sm:order-2 w-full sm:w-auto",
+                          "bg-[var(--blue)] hover:bg-[var(--blue)]/90 text-white",
                           "shadow-sm hover:shadow transition-shadow",
                           isDisabled && "opacity-50 cursor-not-allowed",
                         )}
@@ -165,75 +165,69 @@ export default function EmailScoresAccordion() {
                 </Form>
               )}
 
-              {/* Loading skeleton */}
+              {/* Skeleton responsive */}
               {loading && (
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div
                       key={i}
-                      className="animate-pulse rounded-lg border border-gray-100 p-4 bg-gray-50"
+                      className="animate-pulse rounded-lg border border-gray-100 p-3 sm:p-4 bg-gray-50"
                     >
-                      <div className="h-5 w-1/3 bg-gray-200 rounded mb-3" />
-                      <div className="h-4 w-1/2 bg-gray-200 rounded mb-2" />
-                      <div className="h-4 w-2/3 bg-gray-200 rounded" />
+                      <div className="h-4 w-1/3 bg-gray-200 rounded mb-2" />
+                      <div className="h-3 w-1/2 bg-gray-200 rounded mb-1" />
+                      <div className="h-3 w-2/3 bg-gray-200 rounded" />
                     </div>
                   ))}
                 </div>
               )}
 
-              {/* Results */}
+              {/* Résultats */}
               {results !== null && !loading && (
-                <div className="space-y-5">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-[var(--blue)]">
+                <div className="space-y-4 sm:space-y-5">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center sm:justify-between">
+                    <h3 className="text-sm sm:text-lg font-semibold text-[var(--blue)] break-words">
                       {email ?? ""}
                     </h3>
                     <Button
                       variant="ghost"
                       onClick={() => setResults(null)}
-                      className="text-[var(--blue)] cursor-pointer"
+                      className="text-[var(--blue)] w-full sm:w-auto"
                     >
                       Chercher un autre email
                     </Button>
                   </div>
 
                   {results.length === 0 ? (
-                    <div className="text-[var(--gray-dark)]">
+                    <div className="text-[var(--gray-dark)] text-sm sm:text-base">
                       Aucun résultat pour cet email.
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       {results.map(({ id, input }) => (
                         <div
                           key={id}
-                          role="button"
                           className={cn(
-                            "group block rounded-lg border border-gray-100 bg-white p-4",
+                            "block rounded-lg border border-gray-100 bg-white p-3 sm:p-4",
                             "shadow-sm hover:shadow-lg transition-all duration-300",
-                            "hover:border-[var(--blue)]/20 hover:translate-y-[-2px]",
-                            "hover:bg-gray-50",
-                            "focus:outline-none focus:ring-2 focus:ring-offset-4 focus:ring-[var(--blue)]",
+                            "hover:border-[var(--blue)]/20 hover:-translate-y-0.5",
                             "cursor-pointer",
                           )}
                           onClick={() => router.push(`/scores/${id}`)}
                         >
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <div className="mt-1 text-xl font-bold text-[var(--gray)] group-hover:text-[var(--blue)] transition-colors duration-300">
-                                {input.location}
-                              </div>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="text-sm sm:text-base font-bold text-[var(--gray)] truncate">
+                              {input.location}
                             </div>
-                            <span className="rounded-full px-2.5 mt-2 text-l font-medium bg-[var(--gray-light)] text-[var(--blue)] group-hover:bg-[var(--blue)]/10 transition-colors duration-300">
-                              {input.total_xp} an
-                              {input.total_xp > 1 ? "s" : ""} d'expérience
+                            <span className="rounded-full px-2 py-0.5 text-xs sm:text-sm bg-[var(--gray-light)] text-[var(--blue)]">
+                              {input.total_xp} an{input.total_xp > 1 ? "s" : ""}{" "}
+                              XP
                             </span>
                           </div>
-
-                          <div className="mt-3 text-[var(--blue)]">
-                            <span className="text-xl font-semibold group-hover:text-[var(--blue)]/80 transition-colors duration-300">
+                          <div className="mt-2 text-[var(--blue)]">
+                            <span className="text-base sm:text-xl font-semibold">
                               {input.compensation.toLocaleString("fr-FR")} €
                             </span>{" "}
-                            <span className="text-sm opacity-80">
+                            <span className="text-xs sm:text-sm opacity-80">
                               brut annuel
                             </span>
                           </div>

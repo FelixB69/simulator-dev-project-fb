@@ -6,6 +6,8 @@ import ScoreChartsTabs from "./ScoreChartsTabs";
 import CircularGauge from "./charts/CircularGauge";
 import { toScore10 } from "@/utils/helper";
 import { cn } from "@/utils/cn";
+import { CircleArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type ScoreResultProps = {
   result: {
@@ -77,6 +79,8 @@ export default function ScoreResult({ result }: ScoreResultProps) {
       : "text-[var(--gray-dark)]",
   );
 
+  const router = useRouter();
+
   return (
     <AnimatePresence>
       <motion.div
@@ -86,6 +90,16 @@ export default function ScoreResult({ result }: ScoreResultProps) {
       >
         <div className="relative z-10 space-y-6">
           <ResultCard custom={0} className="text-center">
+            <div className="text-left">
+              <CircleArrowLeft
+                size={40}
+                color="var(--blue)"
+                onClick={() => {
+                  router.push("/");
+                }}
+                className="cursor-pointer transition-transform duration-300 hover:-translate-x-1 active:scale-90"
+              />
+            </div>
             <motion.h2
               variants={fadeIn}
               custom={0.5}
