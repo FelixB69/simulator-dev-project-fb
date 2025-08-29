@@ -232,7 +232,7 @@ export default function LandingForm() {
           </motion.div>
         )}
         <motion.div
-          key="form"
+          key="form2"
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.96 }}

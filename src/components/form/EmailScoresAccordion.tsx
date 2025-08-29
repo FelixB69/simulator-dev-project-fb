@@ -64,6 +64,7 @@ export default function EmailScoresAccordion() {
       setResults(data);
     } catch (e) {
       console.error(e);
+      console.log("ERR", e);
       setResults([]);
       alert("Erreur lors de la récupération des résultats.");
     } finally {
@@ -74,6 +75,7 @@ export default function EmailScoresAccordion() {
   const isDisabled =
     loading || !form.watch("email") || !!form.formState.errors.email;
 
+  const email = form.watch("email");
   return (
     <div className="relative z-10 py-6">
       <section className="w-full min-w-2xl mx-auto">
@@ -89,7 +91,7 @@ export default function EmailScoresAccordion() {
             {/* Trigger */}
             <AccordionTrigger
               className={cn(
-                "group flex w-full items-center justify-between gap-3",
+                "group flex w-full items-center justify-between gap-3 cursor-pointer",
                 "px-4 py-3 sm:px-5 sm:py-4 text-left",
                 "font-medium text-[var(--blue)]",
                 "bg-white hover:bg-gray-50 focus-visible:outline-none",
@@ -143,6 +145,7 @@ export default function EmailScoresAccordion() {
                         type="button"
                         variant="ghost"
                         onClick={() => form.reset({ email: "" })}
+                        className="cursor-pointer"
                       >
                         Réinitialiser
                       </Button>
@@ -150,7 +153,7 @@ export default function EmailScoresAccordion() {
                         type="submit"
                         disabled={isDisabled}
                         className={cn(
-                          "bg-[var(--blue)] hover:bg-[var(--blue)]/90 text-white",
+                          "bg-[var(--blue)] hover:bg-[var(--blue)]/90 text-white cursor-pointer",
                           "shadow-sm hover:shadow transition-shadow",
                           isDisabled && "opacity-50 cursor-not-allowed",
                         )}
@@ -183,12 +186,12 @@ export default function EmailScoresAccordion() {
                 <div className="space-y-5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-[var(--blue)]">
-                      {results[0].input.email}
+                      {email ?? ""}
                     </h3>
                     <Button
                       variant="ghost"
                       onClick={() => setResults(null)}
-                      className="text-[var(--blue)]"
+                      className="text-[var(--blue)] cursor-pointer"
                     >
                       Chercher un autre email
                     </Button>
