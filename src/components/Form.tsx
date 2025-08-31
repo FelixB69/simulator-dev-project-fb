@@ -113,7 +113,7 @@ export default function LandingForm() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[var(--gray-light)] flex items-center justify-center overflow-hidden flex-col">
+    <div className="relative min-h-screen bg-[var(--gray-light)] flex items-center justify-center overflow-hidden flex-col ">
       {phase === "form" && <LiquidWaveBackground />}
 
       <AnimatePresence mode="wait">
@@ -126,11 +126,11 @@ export default function LandingForm() {
             transition={{ duration: 0.5 }}
             className="relative z-10 w-full max-w-md sm:max-w-xl md:max-w-2xl mx-auto"
           >
-            <div className="text-center mb-6 sm:mb-8 sm:mt-0 mt-8 px-2 sm:px-0">
+            <div className="text-center mb-4 sm:mb-6 sm:mt-10 mt-8 px-2 sm:px-0">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--blue)] leading-tight">
                 Votre salaire est-il aligné avec le marché ?
               </h1>
-              <p className="mt-4 text-[var(--gray-dark)] text-base sm:text-lg">
+              <p className="mt-2 text-[var(--gray-dark)] text-base sm:text-lg">
                 Grâce à notre{" "}
                 <span className="font-semibold text-[var(--blue)]">
                   modèle de prédiction

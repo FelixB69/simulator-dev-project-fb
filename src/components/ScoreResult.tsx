@@ -1,43 +1,17 @@
 "use client";
 import React from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { TypingAnimation } from "./magicui/terminal";
 import ScoreChartsTabs from "./ScoreChartsTabs";
 import CircularGauge from "./charts/CircularGauge";
-import { toScore10 } from "@/utils/helper";
+import { euroFR, textOrDash, toScore10, yearsFR } from "@/utils/helper";
 import { cn } from "@/utils/cn";
 import { CircleArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { ScoreInput, ScoreOutput } from "@/hooks/useScoreById";
 
 type ScoreResultProps = {
-  result: {
-    diagnostic: {
-      title: string;
-      description: string;
-      icon?: string;
-    };
-    estimatedGap: {
-      predicted: number;
-      actual: number;
-      difference: number;
-      percentage: number;
-      comment: string;
-    };
-    salaryPosition: {
-      percentile: number;
-      rankLabel: string;
-      comparison: string;
-    };
-    conseil?: string;
-    chartData: {
-      averageByXp: { xp: number; average: number }[];
-      medianByXp: { xp: number; median: number }[];
-      histogram: { range: string; count: number }[];
-    };
-    coherenceScore: number;
-    meanScore: number;
-    stdScore: number;
-  };
+  input: ScoreInput;
+  output: ScoreOutput;
 };
 
 const fadeIn: Variants = {
@@ -45,13 +19,10 @@ const fadeIn: Variants = {
   visible: (i = 0) => ({
     opacity: 1,
     y: 0,
-    transition: {
-      delay: i * 0.1,
-      duration: 0.4,
-      ease: [0.25, 0.1, 0.25, 1],
-    },
+    transition: { delay: i * 0.1, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] },
   }),
 };
+
 const ResultCard = ({ children, className, custom }: any) => (
   <motion.div
     variants={fadeIn}
@@ -65,10 +36,11 @@ const ResultCard = ({ children, className, custom }: any) => (
   </motion.div>
 );
 
-export default function ScoreResult({ result }: ScoreResultProps) {
-  const { diagnostic, estimatedGap, salaryPosition, conseil } = result;
-  const userScore10 = toScore10(result.coherenceScore);
-  const meanScore10 = toScore10(result.meanScore);
+export default function ScoreResult({ input, output }: ScoreResultProps) {
+  const { diagnostic, estimatedGap, salaryPosition, conseil } = output;
+  const { location, total_xp, compensation } = input;
+  const userScore10 = toScore10(output.coherenceScore);
+  const meanScore10 = toScore10(output.meanScore);
 
   const diffClass = cn(
     "font-medium",
@@ -94,16 +66,15 @@ export default function ScoreResult({ result }: ScoreResultProps) {
               <CircleArrowLeft
                 size={40}
                 color="var(--blue)"
-                onClick={() => {
-                  router.push("/");
-                }}
+                onClick={() => router.push("/")}
                 className="cursor-pointer transition-transform duration-300 hover:-translate-x-1 active:scale-90"
               />
             </div>
+
             <motion.h2
               variants={fadeIn}
               custom={0.5}
-              className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight mb-6 text-[var(--blue)]"
+              className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight my-3 sm:my-10  text-[var(--blue)]"
             >
               {diagnostic.title.split(" ").map((word, index) => (
                 <span
@@ -119,15 +90,48 @@ export default function ScoreResult({ result }: ScoreResultProps) {
               ))}
             </motion.h2>
 
-            <div className="flex flex-wrap justify-center gap-6 mb-6">
-              <CircularGauge
-                value={userScore10}
-                label="Ton score de cohérence"
-              />
-              <CircularGauge value={meanScore10} label="Le score moyen" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-6">
+              <div className="text-left  w-2xs mx-auto">
+                <h3 className="text-lg font-semibold text-[var(--blue)] mb-4 text-center md:text-left">
+                  Tes informations saisies
+                </h3>
+                <ul className="space-y-3">
+                  <li className="flex justify-between border-b border-[var(--gray-light)] pb-2">
+                    <span className="text-[var(--gray-dark)]">
+                      Localisation
+                    </span>
+                    <span className="font-semibold">
+                      {textOrDash(location)}
+                    </span>
+                  </li>
+                  <li className="flex justify-between border-b border-[var(--gray-light)] pb-2">
+                    <span className="text-[var(--gray-dark)]">
+                      Expérience totale
+                    </span>
+                    <span className="font-semibold">{yearsFR(total_xp)}</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span className="text-[var(--gray-dark)]">
+                      Rémunération déclarée
+                    </span>
+                    <span className="font-semibold">
+                      {euroFR(compensation)}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Gauges */}
+              <div className="flex justify-center gap-6">
+                <CircularGauge
+                  value={userScore10}
+                  label="Ton score de cohérence"
+                />
+                <CircularGauge value={meanScore10} label="Le score moyen" />
+              </div>
             </div>
 
-            <h1 className="text-[var(--gray-dark)] text-base sm:text-lg font-medium leading-relaxed max-w-2xl mx-auto">
+            <h1 className="text-[var(--gray-dark)] text-base sm:text-lg font-medium leading-relaxed max-w-2xl mx-auto mt-6">
               {diagnostic.description}
             </h1>
           </ResultCard>
@@ -141,7 +145,7 @@ export default function ScoreResult({ result }: ScoreResultProps) {
                 <li className="flex justify-between items-center">
                   <span className="text-[var(--gray-dark)]">Ton salaire</span>
                   <span className="font-semibold">
-                    {estimatedGap.actual.toLocaleString()} €
+                    {estimatedGap.actual.toLocaleString("fr-FR")} €
                   </span>
                 </li>
                 <li className="flex justify-between items-center">
@@ -149,15 +153,16 @@ export default function ScoreResult({ result }: ScoreResultProps) {
                     Notre estimation
                   </span>
                   <span className="font-semibold">
-                    {estimatedGap.predicted.toLocaleString()} €
+                    {estimatedGap.predicted.toLocaleString("fr-FR")} €
                   </span>
                 </li>
                 <li className="flex justify-between items-center">
                   <span className="text-[var(--gray-dark)]">Écart</span>
                   <span className={diffClass}>
                     {estimatedGap.difference > 0 ? "+" : ""}
-                    {estimatedGap.difference.toLocaleString()} € (
-                    {estimatedGap.percentage}%)
+                    {estimatedGap.difference.toLocaleString("fr-FR")} € (
+                    {estimatedGap.percentage}
+                    %)
                   </span>
                 </li>
                 <li className="text-sm text-[var(--gray-dark)] mt-2 italic">
@@ -182,7 +187,7 @@ export default function ScoreResult({ result }: ScoreResultProps) {
                   </span>
                   ).
                 </p>
-                <p className="text-sm text-[var(--gray-dark)]">
+                <p className="text-sm text-[var(--gray-dark)] mt-2 italic">
                   {salaryPosition.comparison}
                 </p>
               </div>
@@ -223,10 +228,10 @@ export default function ScoreResult({ result }: ScoreResultProps) {
           <ResultCard custom={4}>
             <div className="w-full">
               <ScoreChartsTabs
-                chartData={result.chartData}
-                coherenceScore={result.coherenceScore}
-                meanScore={result.meanScore}
-                stdScore={result.stdScore}
+                chartData={output.chartData}
+                coherenceScore={output.coherenceScore}
+                meanScore={output.meanScore}
+                stdScore={output.stdScore}
               />
             </div>
           </ResultCard>

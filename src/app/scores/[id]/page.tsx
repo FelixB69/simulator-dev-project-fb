@@ -9,7 +9,7 @@ import ResultSkeleton from "@/components/ResultSkeleton";
 
 export default function ScorePage() {
   const { id } = useParams<{ id: string }>();
-  const { data, loading, error, refetch } = useScoreById(id);
+  const { output, input, loading, error, refetch } = useScoreById(id);
 
   if (loading) return <ResultSkeleton />;
 
@@ -23,7 +23,7 @@ export default function ScorePage() {
     );
   }
 
-  if (!data) {
+  if (!output || !input) {
     return (
       <ErrorState
         title="Aucun résultat"
@@ -33,5 +33,5 @@ export default function ScorePage() {
     );
   }
 
-  return <ScoreResult result={data} />;
+  return <ScoreResult output={output} input={input} />;
 }

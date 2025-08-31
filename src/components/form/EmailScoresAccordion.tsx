@@ -77,7 +77,7 @@ export default function EmailScoresAccordion() {
 
   const email = form.watch("email");
   return (
-    <div className="relative z-10 py-6 mt-6">
+    <div className="relative z-10 py-6">
       {/* Container */}
       <section className="mx-auto w-full max-w-4xl  min-w-[350px] sm:min-w-2xl">
         <Accordion
@@ -215,12 +215,12 @@ export default function EmailScoresAccordion() {
                           onClick={() => router.push(`/scores/${id}`)}
                         >
                           <div className="flex items-start justify-between gap-2">
-                            <div className="text-sm sm:text-base font-bold text-[var(--gray)] truncate">
+                            <div className="text-md sm:text-base font-bold text-[var(--gray)] truncate">
                               {input.location}
                             </div>
                             <span className="rounded-full px-2 py-0.5 text-xs sm:text-sm bg-[var(--gray-light)] text-[var(--blue)]">
                               {input.total_xp} an{input.total_xp > 1 ? "s" : ""}{" "}
-                              XP
+                              d'expérience
                             </span>
                           </div>
                           <div className="mt-2 text-[var(--blue)]">

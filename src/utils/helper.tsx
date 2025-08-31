@@ -16,3 +16,23 @@ export function mergeAvgMed(averageByXp: Avg[], medianByXp: Med[]): Row[] {
 }
 
 export const toScore10 = (value: number) => +(value * 10).toFixed(1);
+
+export const euroFR = (v: number | undefined | null) =>
+  typeof v === "number" && !Number.isNaN(v)
+    ? v.toLocaleString("fr-FR") + " €"
+    : "—";
+
+export const yearsFR = (v: number | undefined | null) =>
+  typeof v === "number" && !Number.isNaN(v)
+    ? `${v} an${v > 1 ? "s" : ""}`
+    : "—";
+
+export const textOrDash = (v: unknown) =>
+  typeof v === "string" && v.trim() !== ""
+    ? v
+    : v &&
+      typeof v === "object" &&
+      "label" in (v as any) &&
+      typeof (v as any).label === "string"
+    ? (v as any).label
+    : "—";

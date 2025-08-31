@@ -21,6 +21,13 @@ export type ScoreOutput = {
   conseil?: string;
 };
 
+export type ScoreInput = {
+  location: string;
+  total_xp: number;
+  compensation: number;
+  email: string;
+};
+
 type ApiResponse = {
   id: string;
   input?: any;
@@ -35,7 +42,8 @@ type UseScoreOptions = {
 };
 
 type UseScoreReturn = {
-  data: ScoreOutput | null;
+  output: ScoreOutput | null;
+  input: ScoreInput | null;
   raw: ApiResponse | null;
   loading: boolean;
   error: string | null;
@@ -44,12 +52,13 @@ type UseScoreReturn = {
 
 export function useScoreById(
   id?: string | null,
-  opts: UseScoreOptions = {},
+  options: UseScoreOptions = {},
 ): UseScoreReturn {
-  const baseUrl = opts.baseUrl ?? process.env.NEXT_PUBLIC_API_URL!;
-  const [data, setData] = useState<ScoreOutput | null>(null);
+  const baseUrl = options.baseUrl ?? process.env.NEXT_PUBLIC_API_URL!;
+  const [output, setOutput] = useState<ScoreOutput | null>(null);
+  const [input, setInput] = useState<ScoreInput | null>(null);
   const [raw, setRaw] = useState<ApiResponse | null>(null);
-  const [loading, setLoading] = useState<boolean>(!!id && !opts.skip);
+  const [loading, setLoading] = useState<boolean>(!!id && !options.skip);
   const [error, setError] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
@@ -71,14 +80,18 @@ export function useScoreById(
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const json: ApiResponse = await res.json();
-      const normalized = (json.output ?? (json as unknown)) as ScoreOutput;
+      const normalizedOutput = (json.output ??
+        (json as unknown)) as ScoreOutput;
+      const normalizedInput = (json.input ?? (json as unknown)) as ScoreInput;
 
       setRaw(json);
-      setData(normalized);
+      setOutput(normalizedOutput);
+      setInput(normalizedInput);
     } catch (e: any) {
       if (e?.name === "AbortError") return; // navigation/refresh
       setError(e?.message ?? "Erreur réseau");
-      setData(null);
+      setOutput(null);
+      setInput(null);
       setRaw(null);
     } finally {
       setLoading(false);
@@ -87,13 +100,14 @@ export function useScoreById(
 
   // auto-fetch au mount/changement d’id (sauf skip)
   useEffect(() => {
-    if (!id || opts.skip) return;
+    if (!id || options.skip) return;
     fetchOnce();
     return () => abortRef.current?.abort();
-  }, [id, opts.skip, fetchOnce]);
+  }, [id, options.skip, fetchOnce]);
 
   return {
-    data,
+    output,
+    input,
     raw,
     loading,
     error,
