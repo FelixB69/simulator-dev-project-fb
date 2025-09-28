@@ -140,3 +140,20 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Force Tailwind to generate these classes */
+.text-blue {
+  color: var(--color-blue);
+}
+.text-pink {
+  color: var(--color-pink);
+}
+.text-orange {
+  color: var(--color-orange);
+}
+.text-green {
+  color: var(--color-green);
+}
+.text-red {
+  color: var(--color-red);
+}

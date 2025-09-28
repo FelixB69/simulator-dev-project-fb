@@ -1,23 +1,47 @@
+import { useAllScores } from "@/hooks/useScores";
+import { Cards } from "./Cards";
+
 export function Metrics() {
+  const { stats } = useAllScores();
+
+  const STATS_CARDS = [
+    {
+      title: "Nombre de salaires",
+      value: stats?.numberOfScores || 0,
+      textColor: "blue",
+      needCurrency: false,
+    },
+
+    {
+      title: "Nombre d'utilisateurs",
+      value: stats?.numberOfUsers || 0,
+      textColor: "green",
+      needCurrency: false,
+    },
+    {
+      title: "Médiane des salaires",
+      value: stats?.medianCompensation || 0,
+      textColor: "orange",
+      needCurrency: true,
+    },
+    {
+      title: "Moyenne des salaires",
+      value: stats?.averageCompensation || 0,
+      textColor: "pink",
+      needCurrency: true,
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Statistiques</h2>
-        <p className="text-gray-600">Nombre total d'analyses effectuées</p>
-        <p className="text-3xl font-bold text-blue">1,247</p>
-      </div>
-
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Utilisateurs</h2>
-        <p className="text-gray-600">Utilisateurs enregistrés</p>
-        <p className="text-3xl font-bold text-green">892</p>
-      </div>
-
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Revenus</h2>
-        <p className="text-gray-600">Salaire moyen analysé</p>
-        <p className="text-3xl font-bold text-pink">€52,400</p>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {STATS_CARDS.map((card) => (
+        <Cards
+          titles={card.title}
+          value={card.value}
+          textColor={card.textColor}
+          needCurrency={card.needCurrency}
+        />
+      ))}
     </div>
   );
 }

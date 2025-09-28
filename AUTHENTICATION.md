@@ -13,7 +13,10 @@ Le système d'authentification utilise JWT avec refresh token via cookies pour s
 
 ## Utilisation
 
-### 1. Pages protégées
+### 1. Pages protégées (client) + Middleware (serveur)
+
+- Le middleware protège côté serveur toutes les routes listées (ex: `/admin/dashboard`).
+- Le composant `ProtectedRoute` ajoute une couche côté client et gère le `redirect`.
 
 ```tsx
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -98,12 +101,15 @@ function DataComponent() {
 
 ### Middleware Next.js (`middleware.ts`)
 
-- Protection des routes côté serveur
-- Vérification des cookies pour certaines routes
+- Protection des routes côté serveur (ex: `/admin/dashboard`)
+- Vérification des cookies `access_token` ou `refresh_token`
+- Redirection des utilisateurs non authentifiés vers `/admin?redirect=...`
+- Redirection des utilisateurs authentifiés qui visitent `/admin` vers la destination demandée (ou `/admin/dashboard`)
 
 ## Pages disponibles
 
-- `/admin` - Page de connexion/dashboard
+- `/admin` - Page de connexion (gère le paramètre `?redirect=/chemin`)
+- `/admin/dashboard` - Page d'administration protégée (server + client)
 
 ## Gestion des erreurs
 

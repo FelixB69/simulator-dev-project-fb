@@ -20,7 +20,11 @@ export default function ProtectedRoute({
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push(redirectTo);
+      // Ajouter le paramètre de redirection pour retourner vers la page demandée après login
+      const current = window.location.pathname + window.location.search;
+      const url = new URL(redirectTo, window.location.origin);
+      url.searchParams.set("redirect", current);
+      router.push(url.toString());
     }
   }, [isAuthenticated, isLoading, router, redirectTo]);
 

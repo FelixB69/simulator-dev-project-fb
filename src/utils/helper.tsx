@@ -19,13 +19,28 @@ export const toScore10 = (value: number) => +(value * 10).toFixed(1);
 
 export const euroFR = (v: number | undefined | null) =>
   typeof v === "number" && !Number.isNaN(v)
-    ? v.toLocaleString("fr-FR") + " €"
+    ? v.toLocaleString("fr-FR", {
+        currency: "EUR",
+        style: "currency",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      })
     : "—";
 
 export const yearsFR = (v: number | undefined | null) =>
   typeof v === "number" && !Number.isNaN(v)
     ? `${v} an${v > 1 ? "s" : ""}`
     : "—";
+
+export const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString("fr-FR", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
 export const textOrDash = (v: unknown) =>
   typeof v === "string" && v.trim() !== ""

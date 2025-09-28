@@ -1,6 +1,6 @@
 "use client";
 
-import { useAllScores } from "@/hooks/useAllScores";
+import { useAllScores } from "@/hooks/useScores";
 import { Score } from "@/types/score";
 import {
   Table,
@@ -11,8 +11,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Download } from "lucide-react";
+import { RefreshCw, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { euroFR, formatDate } from "@/utils/helper";
 
 interface ScoresTableProps {
   className?: string;
@@ -22,6 +23,8 @@ export function ScoresTable({ className }: ScoresTableProps) {
   const { scores, isLoading, error, refetch } = useAllScores();
   const [sortField, setSortField] = useState<keyof Score>("createdAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const handleSort = (field: keyof Score) => {
     if (sortField === field) {
@@ -45,22 +48,14 @@ export function ScoresTable({ className }: ScoresTableProps) {
     return 0;
   });
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  // Pagination logic
+  const totalPages = Math.ceil(sortedScores.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedScores = sortedScores.slice(startIndex, endIndex);
 
-  const formatSalary = (amount: number) => {
-    return new Intl.NumberFormat("fr-FR", {
-      style: "currency",
-      currency: "EUR",
-      minimumFractionDigits: 0,
-    }).format(amount);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   const exportToCSV = () => {
@@ -219,10 +214,10 @@ export function ScoresTable({ className }: ScoresTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedScores.map((score) => (
+            {paginatedScores.map((score) => (
               <TableRow key={score.id} className="hover:bg-[var(--gray-light)]">
-                <TableCell className="font-semibold text-[var(--pink)]">
-                  {formatSalary(score.compensation)}
+                <TableCell className="font-semibold text-[var(--gray)]">
+                  {euroFR(score.compensation)}
                 </TableCell>
 
                 <TableCell className="text-[var(--gray)]">
@@ -245,6 +240,53 @@ export function ScoresTable({ className }: ScoresTableProps) {
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-6">
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              variant="outline"
+              size="sm"
+              className="flex items-center space-x-1 bg-[var(--white)]/90 backdrop-blur-sm hover:bg-[var(--white)] text-[var(--gray-dark)] hover:text-[var(--blue)] shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed crusor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+
+            <div className="flex items-center space-x-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <Button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    className={`w-8 h-8 p-0 cursor-pointer ${
+                      currentPage === page
+                        ? "bg-[var(--blue)] text-white hover:bg-[var(--blue)]/90"
+                        : "bg-[var(--white)]/90 backdrop-blur-sm hover:bg-[var(--white)] text-[var(--gray-dark)] hover:text-[var(--blue)] shadow-lg"
+                    } transition-all duration-200 `}
+                  >
+                    {page}
+                  </Button>
+                ),
+              )}
+            </div>
+
+            <Button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              variant="outline"
+              size="sm"
+              className="flex items-center space-x-1 bg-[var(--white)]/90 backdrop-blur-sm hover:bg-[var(--white)] text-[var(--gray-dark)] hover:text-[var(--blue)] shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

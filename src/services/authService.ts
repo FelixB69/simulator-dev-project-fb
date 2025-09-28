@@ -51,7 +51,10 @@ class AuthService {
     const expiryTime = Date.now() + expiresIn * 1000;
     localStorage.setItem(this.tokenExpiryKey, expiryTime.toString());
 
-    document.cookie = `access_token=${token}; path=/; max-age=${expiresIn}; SameSite=Strict; Secure`;
+    const isHttps =
+      typeof window !== "undefined" && window.location.protocol === "https:";
+    const secureAttr = isHttps ? "; Secure" : "";
+    document.cookie = `access_token=${token}; path=/; max-age=${expiresIn}; SameSite=Strict${secureAttr}`;
   }
 
   getToken(): string | null {
@@ -74,9 +77,11 @@ class AuthService {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.tokenExpiryKey);
 
-    // Supprimer le cookie access_token
-    document.cookie =
-      "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    // Supprimer le cookie access_token avec les mêmes attributs
+    const isHttps =
+      typeof window !== "undefined" && window.location.protocol === "https:";
+    const secureAttr = isHttps ? "; Secure" : "";
+    document.cookie = `access_token=; path=/; Max-Age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict${secureAttr}`;
 
     fetch("https://api-felixberger.fr/auth/logout", {
       method: "POST",
@@ -98,7 +103,13 @@ class AuthService {
         await this.refreshToken();
         token = this.getToken();
       } catch (error) {
-        window.location.href = "/admin";
+        // En cas d'échec d'auth, rediriger vers la page de login avec retour post-authentification
+        if (typeof window !== "undefined") {
+          const current = window.location.pathname + window.location.search;
+          const url = new URL("/admin", window.location.origin);
+          url.searchParams.set("redirect", current);
+          window.location.href = url.toString();
+        }
         throw error;
       }
     }

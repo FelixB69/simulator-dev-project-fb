@@ -21,7 +21,7 @@ export default function Header() {
           </Button>
         </Link>
 
-        <Link href="/admin">
+        <Link href="/admin/dashboard">
           <Button
             variant="outline"
             size="sm"
