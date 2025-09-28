@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,7 +24,8 @@ const loginSchema = z.object({
 
 type LoginData = z.infer<typeof loginSchema>;
 
-export default function AdminLoginPage() {
+// Child component that uses useSearchParams. It will be wrapped in Suspense by the page.
+function AdminLoginContent() {
   const [loginError, setLoginError] = useState("");
   const { login, isLoading, isAuthenticated } = useAuth();
   const searchParams = useSearchParams();
@@ -68,7 +69,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-2xl font-bold text-center mb-6 text-blue">
-          Administration – Connexion
+          Administration
         </h1>
 
         <Form {...form}>
@@ -122,5 +123,22 @@ export default function AdminLoginPage() {
         </Form>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Chargement...</p>
+          </div>
+        </div>
+      }
+    >
+      <AdminLoginContent />
+    </Suspense>
   );
 }
