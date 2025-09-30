@@ -126,8 +126,8 @@ export default function LandingForm() {
             transition={{ duration: 0.5 }}
             className="relative z-10 w-full max-w-md sm:max-w-xl md:max-w-2xl mx-auto"
           >
-            <div className="text-center mb-4 sm:mb-6 sm:mt-10 mt-8 px-2 sm:px-0">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--blue)] leading-tight">
+            <div className="text-center mb-4 sm:mb-6 sm:mt-10 mt-20 px-2 sm:px-0">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[var(--blue)] leading-tight">
                 Votre salaire est-il aligné avec le marché ?
               </h1>
               <p className="mt-2 text-[var(--gray-dark)] text-base sm:text-lg">

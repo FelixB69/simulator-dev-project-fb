@@ -8,10 +8,12 @@ import ErrorState from "@/components/ErrorState"; // ton composant d’erreur av
 import ResultSkeleton from "@/components/ResultSkeleton";
 
 export default function ScorePage() {
-  const { id } = useParams<{ id: string }>();
-  const { output, input, loading, error, refetch } = useScoreById(id);
+  const { id } = useParams<{ id?: string }>();
+  const { output, input, loading, error, refetch } = useScoreById(id, {
+    skip: !id,
+  });
 
-  if (loading) return <ResultSkeleton />;
+  if (!id || loading) return <ResultSkeleton />;
 
   if (error) {
     return (

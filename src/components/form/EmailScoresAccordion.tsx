@@ -204,15 +204,16 @@ export default function EmailScoresAccordion() {
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       {results.map(({ id, input }) => (
-                        <div
+                        <Link
                           key={id}
+                          href={`/scores/${id}`}
+                          prefetch
                           className={cn(
                             "block rounded-lg border border-gray-100 bg-white p-3 sm:p-4",
                             "shadow-sm hover:shadow-lg transition-all duration-300",
                             "hover:border-[var(--blue)]/20 hover:-translate-y-0.5",
                             "cursor-pointer",
                           )}
-                          onClick={() => router.push(`/scores/${id}`)}
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div className="text-md sm:text-base font-bold text-[var(--gray)] truncate">
@@ -231,7 +232,7 @@ export default function EmailScoresAccordion() {
                               brut annuel
                             </span>
                           </div>
-                        </div>
+                        </Link>
                       ))}
                     </div>
                   )}
